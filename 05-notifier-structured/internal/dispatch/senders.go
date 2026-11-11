@@ -1,13 +1,17 @@
-package senders
+package dispatch
 
 import (
 	"errors"
 	"fmt"
 
-	"example.com/notifier/internal/model"
+	"example.com/notifier/internal/notifiers"
 )
 
-func SafeSend(n model.Notifier, msg string) (err error) {
+type Notifier interface {
+	Send(string) error
+}
+
+func SafeSend(n Notifier, msg string) (err error) {
 	defer func() {
 		if value := recover(); value != nil {
 			err = fmt.Errorf("intercepted panic at send: %v", value)
@@ -17,13 +21,13 @@ func SafeSend(n model.Notifier, msg string) (err error) {
 	return n.Send(msg)
 }
 
-func Dispatch(all []model.Notifier, msg string) error {
+func Dispatch(all []Notifier, msg string) error {
 	for _, n := range all {
 		if err := SafeSend(n, msg); err != nil {
-			if errors.Is(err, model.ErrEmptyMsg) || errors.Is(err, model.ErrLongMsg) {
+			if errors.Is(err, notifiers.ErrEmptyMsg) || errors.Is(err, notifiers.ErrLongMsg) {
 				return fmt.Errorf("dispatch %v: %w", n, err)
 			} else {
-				var target *model.EmailError
+				var target *notifiers.EmailError
 
 				if errors.As(err, &target) {
 					return fmt.Errorf("dispatch inaccessible server of %s", target.Destination())

@@ -1,30 +1,26 @@
 package notifiers
 
-import (
-	"fmt"
+import "fmt"
 
-	"example.com/notifier/internal/model"
-)
-
-type EmailNotifier struct{ model.BaseNotifier }
+type EmailNotifier struct{ baseNotifier }
 
 func NewEmailNotifier(destination string) *EmailNotifier {
-	return &EmailNotifier{BaseNotifier: *model.NewBaseNotifier(destination)}
+	return &EmailNotifier{baseNotifier: *newBaseNotifier(destination)}
 }
 
 func (n EmailNotifier) Send(msg string) error {
 	if msg == "" {
-		return fmt.Errorf("email send: %w", model.ErrEmptyMsg)
+		return fmt.Errorf("email send: %w", ErrEmptyMsg)
 	}
 	if len(msg) > 30 {
-		return fmt.Errorf("email send: %w", model.ErrLongMsg)
+		return fmt.Errorf("email send: %w", ErrLongMsg)
 	}
 	if msg == "FORCE_EMAIL_ERROR" {
-		return model.NewEmailError(n.Destination(), model.ErrBadServer)
+		return NewEmailError(n.destination, ErrBadServer)
 	}
 
-	n.Log(msg)
-	_, err := fmt.Printf("Email:\n\tmail to: %s\n\tmessage: %s\n\n", n.Destination(), msg)
+	n.log(msg)
+	_, err := fmt.Printf("Email:\n\tmail to: %s\n\tmessage: %s\n\n", n.destination, msg)
 
 	return err
 }

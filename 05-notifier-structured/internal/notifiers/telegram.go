@@ -1,30 +1,26 @@
 package notifiers
 
-import (
-	"fmt"
+import "fmt"
 
-	"example.com/notifier/internal/model"
-)
-
-type TelegramNotifier struct{ model.BaseNotifier }
+type TelegramNotifier struct{ baseNotifier }
 
 func NewTelegramNotifier(destination string) *TelegramNotifier {
-	return &TelegramNotifier{BaseNotifier: *model.NewBaseNotifier(destination)}
+	return &TelegramNotifier{baseNotifier: *newBaseNotifier(destination)}
 }
 
 func (n TelegramNotifier) Send(msg string) error {
 	if msg == "" {
-		return fmt.Errorf("telegram send: %w", model.ErrEmptyMsg)
+		return fmt.Errorf("telegram send: %w", ErrEmptyMsg)
 	}
 	if len(msg) > 20 {
-		return fmt.Errorf("telegram send: %w", model.ErrLongMsg)
+		return fmt.Errorf("telegram send: %w", ErrLongMsg)
 	}
 	if msg == "FORCE_EMAIL_ERROR" {
 		return nil
 	}
 
-	n.Log(msg)
-	_, err := fmt.Printf("Telegram:\n\tuser   : %s\n\tmessage: %s\n\n", n.Destination(), msg)
+	n.log(msg)
+	_, err := fmt.Printf("Telegram:\n\tuser   : %s\n\tmessage: %s\n\n", n.destination, msg)
 
 	return err
 }

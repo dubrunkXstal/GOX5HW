@@ -1,13 +1,9 @@
 package notifiers
 
-import (
-	"example.com/notifier/internal/model"
-)
-
-type BrokenNotifier struct{ model.BaseNotifier }
+type BrokenNotifier struct{ baseNotifier }
 
 func NewBrokenNotifier(destination string) *BrokenNotifier {
-	return &BrokenNotifier{BaseNotifier: *model.NewBaseNotifier(destination)}
+	return &BrokenNotifier{baseNotifier: *newBaseNotifier(destination)}
 }
 
 func (BrokenNotifier) Send(msg string) error {

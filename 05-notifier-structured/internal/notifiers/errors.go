@@ -1,4 +1,4 @@
-package model
+package notifiers
 
 import (
 	"errors"
